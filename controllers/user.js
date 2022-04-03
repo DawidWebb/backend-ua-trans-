@@ -2,13 +2,20 @@ const { v4: uuid } = require("uuid");
 const Login = require("../models/login");
 const mailer = require("../helpers/sendMail");
 const adminMailer = require("../helpers/adminMail");
+const crypto = require("crypto");
 
 // ADD NEW USER, ACESS IS SET ON USER AS DEFAUL
 
 exports.addUser = (request, response, next) => {
   try {
-    const { login, password, access, name, rodo, conditions, dateOfAdd } =
-      request.body;
+    const { login, password, name, dateOfAdd } = request.body;
+
+    //PRODUCTION ADD rodo, conditions,
+
+    const secret = "";
+    const md5Hasher = crypto.createHmac("md5", secret);
+    const hashPass = md5Hasher.update(password).digest("hex");
+
     Login.find({ login }, (err, data) => {
       if (data.length) {
         response.status(404).json({
@@ -18,11 +25,10 @@ exports.addUser = (request, response, next) => {
       } else {
         new Login({
           login,
-          password,
-          access,
+          hashPass,
           name,
-          rodo,
-          conditions,
+          rodo: true,
+          conditions: true,
           dateOfAdd,
           active: false,
         }).save();
@@ -30,23 +36,23 @@ exports.addUser = (request, response, next) => {
           status: 200,
         });
         // HANDLE SEND EMAIL TO NEW USER
-        const props = {
-          title: "Twoje konto zostało utworzone.",
-          infoBeforeLink:
-            "Towje konto jest nieaktywne, kliknij w poniższy link lub skopiuj go i wklej do przeglądarki, aby aktywować konto: ",
-          link: `https://www.tslmanagement.pl/#/confirmation`,
-          additionalInfo: "",
-          subject: "Potwierdzenie założenia konta",
-          mailTo: `${login}`,
-        };
-        mailer.mailSend(props);
+        // const props = {
+        //   title: "Twoje konto zostało utworzone.",
+        //   infoBeforeLink:
+        //     "Towje konto jest nieaktywne, kliknij w poniższy link lub skopiuj go i wklej do przeglądarki, aby aktywować konto: ",
+        //   link: `https://www.tslmanagement.pl/#/confirmation`,
+        //   additionalInfo: "",
+        //   subject: "Potwierdzenie założenia konta",
+        //   mailTo: `${login}`,
+        // };
+        // mailer.mailSend(props);
 
         //SEND MAIL To ADMIN
-        const adminData = {
-          mailFrom: `${login}`,
-          content: "dodał konto",
-        };
-        adminMailer.adminInfo(adminData);
+        // const adminData = {
+        //   mailFrom: `${login}`,
+        //   content: "dodał konto",
+        // };
+        // adminMailer.adminInfo(adminData);
       }
     });
   } catch (error) {
@@ -202,6 +208,10 @@ exports.postUser = (request, response, next) => {
   try {
     const { login, password } = request.body;
 
+    const secret = "";
+    const md5Hasher = crypto.createHmac("md5", secret);
+    const hash = md5Hasher.update(password).digest("hex");
+
     Login.find({ login }, (err, data) => {
       if (!data.length) {
         response.status(404).json({
@@ -213,8 +223,7 @@ exports.postUser = (request, response, next) => {
           message: `Użytkownik ${login} jest nie aktywny`,
         });
       } else {
-        const uncodedPass = data[0].password.toString();
-        if (uncodedPass !== password) {
+        if (data[0].hashPass !== hash.toString()) {
           response.status(404).json({
             message: "Login lub hasło się nie zgadza",
           });
@@ -224,12 +233,11 @@ exports.postUser = (request, response, next) => {
             id: data[0]._id,
             loginId: uuid(),
             user: data[0].login,
-            access: data[0].access,
+            access: "user",
             name: data[0].name,
             addDate: data[0].dateOfAdd,
           };
           response.status(200).json({
-            status: 200,
             user,
           });
         }

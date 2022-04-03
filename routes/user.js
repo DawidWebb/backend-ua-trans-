@@ -9,7 +9,6 @@ const {
   putUser,
   confirmAdd,
   lostPassword,
-  putUserComments,
   getUsersLength,
 } = require("../controllers/user");
 

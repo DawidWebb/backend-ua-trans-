@@ -4,14 +4,11 @@ const { Schema } = mongoose;
 const loginSchema = new Schema({
   login: { type: String, required: true },
   name: { type: String, required: true },
-  password: { type: Buffer, required: true },
-  access: { type: String, required: true },
+  hashPass: { type: String, required: true },
   rodo: { type: Boolean, required: true },
   conditions: { type: Boolean, required: true },
-  dateOfAdd: { type: String },
+  dateOfAdd: { type: Date },
   active: { type: Boolean },
-  postsIdForComments: { type: Array },
-  postsIdForLikes: { type: Array },
 });
 
 module.exports = mongoose.model("Login", loginSchema);
