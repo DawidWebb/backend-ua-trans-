@@ -30,8 +30,8 @@ app.use(fileUploader());
 
 // app.use("/admin", adminRoutes);
 // app.use("/help", helpRoutes);
-app.use("/have-transport", needTransport);
-app.use("/need-transport", haveTransport);
+app.use("/need-transport", needTransport);
+app.use("/have-transport", haveTransport);
 app.use("/users", usersRoutes);
 
 app.use(

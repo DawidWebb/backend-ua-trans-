@@ -1,9 +1,9 @@
-const transportSchema = require("../models/transport");
+const Transport = require("../models/transport");
 
-exports.getComments = (request, response, next) => {
+exports.getTransports = (request, response, next) => {
   try {
-    const findECommnts = commentSchema.find();
-    findECommnts.exec((err, data) => {
+    const findTransports = Transport.find();
+    findTransports.exec((err, data) => {
       response.status(200).json({
         data,
       });
@@ -12,7 +12,7 @@ exports.getComments = (request, response, next) => {
     response.status(500).json({
       error,
       message:
-        "Oops! Coś poszło nie tak, przy metodzie GET w endpointcie /getComments",
+        "Oops! Coś poszło nie tak, przy metodzie GET w endpointcie /getTransports",
     });
   }
 };
@@ -42,12 +42,12 @@ exports.getCommentsByUserId = (request, response, next) => {
   }
 };
 
-exports.postComment = (request, response, next) => {
+exports.postTransport = (request, response, next) => {
   try {
     const body = request.body;
-    const newComment = new commentSchema(body);
+    const newTransport = new Transport(body);
 
-    newComment.save((err, data) => {
+    newTransport.save((err, data) => {
       if (err) {
         console.log(err);
         return;

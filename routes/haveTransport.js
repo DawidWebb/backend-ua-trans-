@@ -3,9 +3,9 @@ const haveController = require("../controllers/haveTransport");
 
 const router = express.Router();
 
-router.get("/", haveController.getComments);
+router.get("/", haveController.getTransports);
 router.get("/:id", haveController.getCommentsByUserId);
-router.post("/", haveController.postComment);
+router.post("/", haveController.postTransport);
 router.put("/", haveController.editComment);
 router.put("/del", haveController.delAllCommentsFromPost);
 router.delete("/:id", haveController.delComment);
