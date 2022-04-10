@@ -17,30 +17,30 @@ exports.getTransports = (request, response, next) => {
   }
 };
 
-exports.getCommentsByUserId = (request, response, next) => {
-  const userId = request.params.id;
+// exports.getCommentsByUserId = (request, response, next) => {
+//   const userId = request.params.id;
 
-  try {
-    const userComments = [];
-    const findECommnts = commentSchema.find();
-    findECommnts.exec((err, data) => {
-      data.map((item) => {
-        if (item.userId === userId) {
-          userComments.push(item);
-        }
-      });
-      response.status(200).json({
-        userComments,
-      });
-    });
-  } catch (error) {
-    response.status(500).json({
-      error,
-      message:
-        "Oops! Coś poszło nie tak, przy metodzie GET w endpointcie /getComments",
-    });
-  }
-};
+//   try {
+//     const userComments = [];
+//     const findECommnts = commentSchema.find();
+//     findECommnts.exec((err, data) => {
+//       data.map((item) => {
+//         if (item.userId === userId) {
+//           userComments.push(item);
+//         }
+//       });
+//       response.status(200).json({
+//         userComments,
+//       });
+//     });
+//   } catch (error) {
+//     response.status(500).json({
+//       error,
+//       message:
+//         "Oops! Coś poszło nie tak, przy metodzie GET w endpointcie /getComments",
+//     });
+//   }
+// };
 
 exports.postTransport = (request, response, next) => {
   try {
@@ -74,7 +74,7 @@ exports.editComment = (request, response, next) => {
       content,
     };
 
-    commentSchema.findByIdAndUpdate(
+    Transport.findByIdAndUpdate(
       filter,
       update,
       { new: true },
@@ -99,12 +99,14 @@ exports.editComment = (request, response, next) => {
   }
 };
 
-exports.delComment = (request, response, next) => {
+exports.delTransport = (request, response, next) => {
+
+
   try {
-    commentSchema.findByIdAndDelete(request.params.id, (err) => {
+    Transport.findByIdAndDelete(request.params.id, (err) => {
       if (err) {
         response.status(404).json({
-          message: "Nie ma komentarza do usunięcia",
+          message: "Nie ma transportu do usunięcia",
         });
         return;
       }
@@ -114,30 +116,9 @@ exports.delComment = (request, response, next) => {
     response.status(500).json({
       error,
       message:
-        "Oops! Coś poszło nie tak, przy metodzie DELETE w endpointcie /posts/:id",
+        "Oops! Coś poszło nie tak, przy metodzie DELETE w endpointcie /haveTransports/:id",
     });
   }
 };
 
-exports.delAllCommentsFromPost = (request, response, next) => {
-  try {
-    const commentsIds = request.body;
-    commentsIds.data.forEach((item) => {
-      commentSchema.findByIdAndDelete(item, (err) => {
-        if (err) {
-          response.status(404).json({
-            message: "Nie ma komentarza do usunięcia",
-          });
-          return;
-        }
-        response.status(200).end();
-      });
-    });
-  } catch (error) {
-    response.status(500).json({
-      error,
-      message:
-        "Oops! Coś poszło nie tak, przy metodzie DELETE w endpointcie /posts/:id",
-    });
-  }
-};
+
