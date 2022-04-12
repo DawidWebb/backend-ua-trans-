@@ -65,43 +65,61 @@ exports.postTransport = (request, response, next) => {
   }
 };
 
-exports.editComment = (request, response, next) => {
+exports.editTransport = (request, response, next) => {
   try {
-    const { commentId, content } = request.body;
+    const {
+      transportId,
+      userId,
+      loadCity,
+      delCity,
+      startDate,
+      endDate,
+      kindOfTruck,
+      weight,
+      package,
+      quanity,
+      describe,
+      contact,
+      kindOfTransport,
+    } = request.body;
 
-    const filter = commentId;
+    const filter = transportId;
     const update = {
-      content,
+      userId,
+      loadCity,
+      delCity,
+      startDate,
+      endDate,
+      kindOfTruck,
+      weight,
+      package,
+      quanity,
+      describe,
+      contact,
+      kindOfTransport,
     };
 
-    Transport.findByIdAndUpdate(
-      filter,
-      update,
-      { new: true },
-      (err, data) => {
-        if (err) {
-          response.status(404).json({
-            message: "brak komentarza do edycji",
-          });
-          return;
-        }
-        response.status(202).json({
-          data,
+    Transport.findByIdAndUpdate(filter, update, { new: true }, (err, data) => {
+      if (err) {
+        response.status(404).json({
+          message: "brak danych do edycji",
         });
+        return;
       }
-    );
+      response.status(202).json({
+        data,
+      });
+    });
   } catch (error) {
     response.status(500).json({
       error,
       message:
-        "Oops! Coś poszło nie tak, przy metodzie PUT w endpointcie /comments",
+        "Oops! Coś poszło nie tak, przy metodzie PUT w endpointcie /have-transport",
     });
   }
 };
 
 exports.delTransport = (request, response, next) => {
-
-
   try {
     Transport.findByIdAndDelete(request.params.id, (err) => {
       if (err) {
@@ -120,5 +138,3 @@ exports.delTransport = (request, response, next) => {
     });
   }
 };
-
-

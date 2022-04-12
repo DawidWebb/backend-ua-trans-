@@ -1,11 +1,9 @@
-const transportSchema = require("../models/transport");
-const fileUpload = require("../helpers/fileUploader");
-const fs = require("fs");
-// get all posts from DB
-exports.getPosts = (request, response, next) => {
+const Needs = require("../models/needs");
+
+exports.getNeeds = (request, response, next) => {
   try {
-    const findSPosts = postSchema.find();
-    findSPosts.exec((err, data) => {
+    const findNeeds = Needs.find();
+    findNeeds.exec((err, data) => {
       response.status(200).json({
         data,
       });
@@ -19,28 +17,17 @@ exports.getPosts = (request, response, next) => {
   }
 };
 
-// // add post to DB
-exports.postPost = (request, res, next) => {
+exports.postNeeds = (request, response, next) => {
   try {
-    const { id, title, content, link, user, userName, date, imgPath } =
-      request.body;
-    const body = {
-      id: id,
-      title: title,
-      content: content,
-      link: link,
-      user: user,
-      userName: userName,
-      date: date,
-      imgPath: imgPath,
-    };
-    const newPost = new postSchema(body);
-    newPost.save((err, data) => {
+    const body = request.body;
+    const newTransport = new Needs(body);
+
+    newTransport.save((err, data) => {
       if (err) {
         console.log(err);
         return;
       }
-      res.status(201).json({
+      response.status(201).json({
         data,
       });
     });
