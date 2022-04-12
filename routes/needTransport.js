@@ -7,8 +7,8 @@ router.use(cors());
 
 router.get("/", cors(), needController.getNeeds);
 router.post("/", cors(), needController.postNeeds);
-router.put("/", cors(), needController.putPost);
-router.delete("/:id", cors(), needController.deletePost);
+router.put("/", cors(), needController.editNeeds);
+router.delete("/:id", cors(), needController.delNeeds);
 
 router.use((request, response) => response.status(404).end());
 

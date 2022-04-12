@@ -40,53 +40,45 @@ exports.postNeeds = (request, response, next) => {
   }
 };
 
-exports.addFile = (request, response, next) => {
-  try {
-    const file = request.files.file;
-
-    file.mv(`${__dirname}/uploads/${file.name}`, (err) => {
-      if (err) {
-        return response.status(500).json({
-          err,
-          message:
-            "Oops! Coś poszło nie tak, przy metodzie POST w endpointcie /fileUpload",
-        });
-      } else {
-        // fileUpload.uploadFile(file.name);
-
-        return response.status(201).json({
-          fileName: file.name,
-        });
-      }
-    });
-  } catch (error) {
-    response.status(500).json({
-      error,
-      message:
-        "Oops! Coś poszło nie tak, przy metodzie POST w endpointcie /fileUpload",
-    });
-  }
-};
-
 // edit and change data of Post
-exports.putPost = (request, response, next) => {
+exports.editNeeds = (request, response, next) => {
   try {
-    const { id, title, content, link, user, userName, date } = request.body;
+    const {
+      transportId,
+      userId,
+      loadCity,
+      delCity,
+      startDate,
+      endDate,
+      kindOfTruck,
+      weight,
+      package,
+      quanity,
+      describe,
+      contact,
+      kindOfTransport,
+    } = request.body;
 
-    const filter = id;
+    const filter = transportId;
     const update = {
-      title,
-      content,
-      link,
-      user,
-      userName,
-      date,
+      userId,
+      loadCity,
+      delCity,
+      startDate,
+      endDate,
+      kindOfTruck,
+      weight,
+      package,
+      quanity,
+      describe,
+      contact,
+      kindOfTransport,
     };
 
-    postSchema.findByIdAndUpdate(filter, update, { new: true }, (err, data) => {
+    Needs.findByIdAndUpdate(filter, update, { new: true }, (err, data) => {
       if (err) {
         response.status(404).json({
-          message: "brak postu do edycji",
+          message: "brak danych do edycji",
         });
         return;
       }
@@ -98,18 +90,18 @@ exports.putPost = (request, response, next) => {
     response.status(500).json({
       error,
       message:
-        "Oops! Coś poszło nie tak, przy metodzie PUT w endpointcie /posts",
+        "Oops! Coś poszło nie tak, przy metodzie PUT w endpointcie /need-transport",
     });
   }
 };
 
 // delete post
-exports.deletePost = (request, response, next) => {
+exports.delNeeds = (request, response, next) => {
   try {
-    postSchema.findByIdAndDelete(request.params.id, (err) => {
+    Needs.findByIdAndDelete(request.params.id, (err) => {
       if (err) {
         response.status(404).json({
-          message: "Nie ma postu do usunięcia",
+          message: "Nie ma informacji do usunięcia",
         });
         return;
       }
@@ -119,7 +111,7 @@ exports.deletePost = (request, response, next) => {
     response.status(500).json({
       error,
       message:
-        "Oops! Coś poszło nie tak, przy metodzie DELETE w endpointcie /posts/:id",
+        "Oops! Coś poszło nie tak, przy metodzie DELETE w endpointcie /haveTransports/:id",
     });
   }
 };
