@@ -12,7 +12,7 @@ exports.getNeeds = (request, response, next) => {
     response.status(500).json({
       error,
       message:
-        "Oops! Coś poszło nie tak, przy metodzie GET w endpointcie /getPosts",
+        "Przepraszamy błąd po stronie serwera, spróbuj za kilka minut / На жаль, помилка на стороні сервера, будь ласка, спробуйте за кілька хвилин.",
     });
   }
 };
@@ -35,7 +35,7 @@ exports.postNeeds = (request, response, next) => {
     response.status(500).json({
       error,
       message:
-        "Oops! Coś poszło nie tak, przy metodzie POST w endpointcie /post/add",
+        "Przepraszamy błąd po stronie serwera, spróbuj za kilka minut / На жаль, помилка на стороні сервера, будь ласка, спробуйте за кілька хвилин.",
     });
   }
 };
@@ -90,7 +90,7 @@ exports.editNeeds = (request, response, next) => {
     response.status(500).json({
       error,
       message:
-        "Oops! Coś poszło nie tak, przy metodzie PUT w endpointcie /need-transport",
+        "Przepraszamy błąd po stronie serwera, spróbuj za kilka minut / На жаль, помилка на стороні сервера, будь ласка, спробуйте за кілька хвилин.",
     });
   }
 };
@@ -111,7 +111,7 @@ exports.delNeeds = (request, response, next) => {
     response.status(500).json({
       error,
       message:
-        "Oops! Coś poszło nie tak, przy metodzie DELETE w endpointcie /haveTransports/:id",
+        "Przepraszamy błąd po stronie serwera, spróbuj za kilka minut / На жаль, помилка на стороні сервера, будь ласка, спробуйте за кілька хвилин.",
     });
   }
 };
