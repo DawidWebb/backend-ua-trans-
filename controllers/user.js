@@ -8,9 +8,8 @@ const crypto = require("crypto");
 
 exports.addUser = (request, response, next) => {
   try {
-    const { login, password, name, dateOfAdd } = request.body;
-
-    //PRODUCTION ADD rodo, conditions,
+    const { login, password, name, dateOfAdd, language, rodo, conditions } =
+      request.body;
 
     const secret = "";
     const md5Hasher = crypto.createHmac("md5", secret);
@@ -20,17 +19,20 @@ exports.addUser = (request, response, next) => {
       if (data.length) {
         response.status(404).json({
           status: 404,
-          message: "Podany adres eMail już istnieje w bazie danych",
+          message:
+            language === "PL"
+              ? "Podany adres eMail już istnieje w bazie danych"
+              : "Наведена адреса електронної пошти вже існує в базі даних",
         });
       } else {
         new Login({
           login,
           hashPass,
           name,
-          rodo: true,
-          conditions: true,
+          rodo: rodo,
+          conditions: conditions,
           dateOfAdd,
-          active: false,
+          active: true,
         }).save();
         response.status(200).json({
           status: 200,
@@ -58,7 +60,10 @@ exports.addUser = (request, response, next) => {
   } catch (error) {
     response.status(500).json({
       error,
-      message: "Coś poszło nie tak, przy metodzie POST w endpointcie /addUser",
+      message:
+        language === "PL"
+          ? "Przepraszamy błąd po stronie serwera, spróbuj za kilka minut."
+          : "На жаль, помилка на стороні сервера, будь ласка, спробуйте за кілька хвилин.",
     });
   }
 };
@@ -108,7 +113,8 @@ exports.confirmAdd = (request, response) => {
 
 exports.lostPassword = (request, response, next) => {
   try {
-    const userLogin = request.params.userLogin;
+    const userLogin = request.params.login;
+    const language = request.params.language;
 
     const findUser = Login.find({
       login: userLogin,
@@ -116,17 +122,24 @@ exports.lostPassword = (request, response, next) => {
     findUser.exec((err, data) => {
       if (data.length === 0 || data === null) {
         response.status(404).json({
-          message: "Nie ma takiego adresu email w bazie",
+          message:
+            language === "PL"
+              ? "Nie ma tekiego adresu eMail w bazie"
+              : "У базі даних такої адреси електронної пошти немає",
         });
         return;
       }
       const filter = data[0]._id;
       const password = uuid().toString();
       const update = { password: password };
+
       Login.findByIdAndUpdate(filter, update, { new: true }, (err, data) => {
         if (err) {
           response.status(404).json({
-            message: "coś poszło nie tak przy lostPassword",
+            message:
+              language === "PL"
+                ? "Przepraszamy błąd po stronie serwera, spróbuj za kilka minut."
+                : "На жаль, помилка на стороні сервера, будь ласка, спробуйте за кілька хвилин.",
           });
           return;
         }
@@ -134,12 +147,14 @@ exports.lostPassword = (request, response, next) => {
           message: "Na podany adres eMail został wyałsany link do zmiany hasła",
         });
         const props = {
-          title: "Hasło tymczasowe",
+          title: language === "PL" ? "Hasło tymczasowe" : "Тимчасовий пароль",
           infoBeforeLink:
-            "Poniżej Twoje hasło tymczasowe, jest ważne przez 12 godzin. Zmień hasło po zalogowaniu. ",
+            language === "PL"
+              ? "Poniżej Twoje hasło tymczasowe, jest ważne przez 12 godzin. Zmień hasło po zalogowaniu."
+              : "Ваш тимчасовий пароль дійсний протягом 12 годин нижче. Змініть пароль після входу",
           link: "",
           additionalInfo: `${password}`,
-          subject: "Zmiana hasła",
+          subject: language === "PL" ? "Zmiana hasła" : "Зміна пароля",
           mailTo: `${userLogin}`,
         };
         mailer.mailSend(props);
@@ -154,7 +169,9 @@ exports.lostPassword = (request, response, next) => {
     response.status(500).json({
       error,
       message:
-        "Oops! Coś poszło nie tak, przy metodzie GET w endpointcie /lostPassword",
+        language === "PL"
+          ? "Przepraszamy błąd po stronie serwera, spróbuj za kilka minut."
+          : "На жаль, помилка на стороні сервера, будь ласка, спробуйте за кілька хвилин.",
     });
   }
 };
@@ -206,7 +223,7 @@ exports.getUsersLength = (request, response, next) => {
 
 exports.postUser = (request, response, next) => {
   try {
-    const { login, password } = request.body;
+    const { login, password, language } = request.body;
 
     const secret = "";
     const md5Hasher = crypto.createHmac("md5", secret);
@@ -215,17 +232,26 @@ exports.postUser = (request, response, next) => {
     Login.find({ login }, (err, data) => {
       if (!data.length) {
         response.status(404).json({
-          message: "Użytkownik o podanym loginie nie istnieje",
+          message:
+            language === "PL"
+              ? "Użytkownik o podanym loginie nie istnieje"
+              : "Користувач із зазначеним логіном не існує",
         });
         return;
       } else if (!data[0].active) {
         response.status(404).json({
-          message: `Użytkownik ${login} jest nie aktywny`,
+          message:
+            language === "PL"
+              ? `Użytkownik ${login} jest nie aktywny`
+              : `Користувач ${login} неактивний`,
         });
       } else {
         if (data[0].hashPass !== hash.toString()) {
           response.status(404).json({
-            message: "Login lub hasło się nie zgadza",
+            message:
+              language === "PL"
+                ? `Login lub hasło się nie zgadza`
+                : `Логін або пароль не збігаються`,
           });
           return;
         } else {
@@ -247,7 +273,9 @@ exports.postUser = (request, response, next) => {
     response.status(500).json({
       error,
       message:
-        "Oops! Coś poszło nie tak, przy metodzie GET w endpointcie /postUsers",
+        language === "PL"
+          ? "Przepraszamy błąd po stronie serwera, spróbuj za kilka minut."
+          : "На жаль, помилка на стороні сервера, будь ласка, спробуйте за кілька хвилин.",
     });
   }
 };
@@ -288,17 +316,26 @@ exports.changeUserPermission = (request, response, next) => {
 
 exports.putUser = (request, response, next) => {
   try {
-    const { id, password, name } = request.body;
+    const { id, password, language } = request.body;
+
+    const secret = "";
+    const md5Hasher = crypto.createHmac("md5", secret);
+    const hashPass = md5Hasher.update(password).digest("hex");
 
     const filter = id;
-    const update = { password };
+    const update = { hashPass };
+
     Login.findByIdAndUpdate(filter, update, { new: true }, (err, data) => {
       if (err) {
         response.status(404).json({
-          message: "coś poszło nie tak przy userUpdate",
+          message:
+            language === "PL"
+              ? "Przepraszamy błąd po stronie serwera, spróbuj za kilka minut."
+              : "На жаль, помилка на стороні сервера, будь ласка, спробуйте за кілька хвилин.",
         });
         return;
       }
+      console.log(data);
       response.status(202).json({
         data,
       });
@@ -307,7 +344,9 @@ exports.putUser = (request, response, next) => {
     response.status(500).json({
       error,
       message:
-        "Oops! Coś poszło nie tak, przy metodzie PUT w endpointcie /putUser",
+        language === "PL"
+          ? "Przepraszamy błąd po stronie serwera, spróbuj za kilka minut."
+          : "На жаль, помилка на стороні сервера, будь ласка, спробуйте за кілька хвилин.",
     });
   }
 };
@@ -315,7 +354,7 @@ exports.putUser = (request, response, next) => {
 exports.delUser = (request, response, next) => {
   try {
     const userId = request.params.id;
-    const userPassword = request.params.password;
+    const language = request.params.language;
 
     const findUser = Login.find({
       _id: userId,
@@ -323,41 +362,47 @@ exports.delUser = (request, response, next) => {
     findUser.exec((err, data) => {
       if (data.length === 0 || data === null) {
         response.status(404).json({
-          message: "Nie ma takiego użytkownika w bazie",
+          message:
+            language === "PL"
+              ? "Nie ma takiego użytkownika w bazie"
+              : "У базі даних такого користувача немає",
         });
         return;
-      } else if (data[0].password.toString() !== userPassword) {
-        response.status(404).json({
-          message: "Hasło nie poprawne",
-        });
+        // } else if (data[0].password.toString() !== userPassword) {
+        //   response.status(404).json({
+        //     message: "Hasło nie poprawne",
+        //   });
       } else {
         const filter = userId;
         const update = { active: false };
         Login.findByIdAndUpdate(filter, update, { new: true }, (err, data) => {
           if (err) {
             response.status(404).json({
-              message: "coś poszło nie tak przy deleteUser",
+              message:
+                language === "PL"
+                  ? "Przepraszamy błąd po stronie serwera, spróbuj za kilka minut."
+                  : "На жаль, помилка на стороні сервера, будь ласка, спробуйте за кілька хвилин.",
             });
             return;
           }
 
           response.status(200).end();
 
-          const props = {
-            title: "Właśnie usunołeś swoje konto z serwisu",
-            infoBeforeLink: "Dziękujemy że z nami byłeś.",
-            link: "",
-            additionalInfo:
-              "Twoje konto i dane które podałeś zostału usunięte, Twoje komentarze i posty pozostały w serwisie.",
-            subject: "Usunięcie konta",
-            mailTo: `${data.login}`,
-          };
-          mailer.mailSend(props);
-          const adminData = {
-            mailFrom: `${data.login}`,
-            content: "usunął konto",
-          };
-          adminMailer.adminInfo(adminData);
+          // const props = {
+          //   title: "Właśnie usunołeś swoje konto z serwisu",
+          //   infoBeforeLink: "Dziękujemy że z nami byłeś.",
+          //   link: "",
+          //   additionalInfo:
+          //     "Twoje konto i dane które podałeś zostału usunięte, Twoje komentarze i posty pozostały w serwisie.",
+          //   subject: "Usunięcie konta",
+          //   mailTo: `${data.login}`,
+          // };
+          // mailer.mailSend(props);
+          // const adminData = {
+          //   mailFrom: `${data.login}`,
+          //   content: "usunął konto",
+          // };
+          // adminMailer.adminInfo(adminData);
         });
       }
     });
@@ -365,7 +410,9 @@ exports.delUser = (request, response, next) => {
     response.status(500).json({
       error,
       message:
-        "Oops! Coś poszło nie tak, przy metodzie GET w endpointcie /delUser",
+        language === "PL"
+          ? "Przepraszamy błąd po stronie serwera, spróbuj za kilka minut."
+          : "На жаль, помилка на стороні сервера, будь ласка, спробуйте за кілька хвилин.",
     });
   }
 };
