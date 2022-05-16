@@ -8,7 +8,7 @@ exports.mailSend = (props) => {
   const { title, link, infoBeforeLink, additionalInfo, subject, mailTo } =
     props;
 
-  const mailFrom = "blog@tslmanagement.pl";
+  const mailFrom = "ua.transport@developerweb.pl";
 
   const transport = nodemailer.createTransport(
     sendgridTransport({

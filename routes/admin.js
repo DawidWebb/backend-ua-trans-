@@ -1,9 +1,9 @@
 const express = require("express");
-const { getUsers } = require("../controllers/admin");
+const { getUsers, handleMailFormUser } = require("../controllers/admin");
 
 const router = express.Router();
 
-// router.post("/", postUser);
+router.post("/form", handleMailFormUser);
 // router.post("/add", addUser);
 // router.put("/", putUser);
 router.get("/", getUsers);

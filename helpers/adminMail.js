@@ -17,8 +17,8 @@ exports.adminInfo = (adminData) => {
 
   transport
     .sendMail({
-      to: "blog@tslmanagement.pl",
-      from: "blog@tslmanagement.pl",
+      to: "ua.transport@developerweb.pl",
+      from: "ua.transport@developerweb.pl",
       subject: `Użytkownik ${content}`,
       html: `<p>Użytkownik: ${mailFrom} - ${content}</p>`,
     })

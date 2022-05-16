@@ -37,24 +37,35 @@ exports.addUser = (request, response, next) => {
         response.status(200).json({
           status: 200,
         });
-        // HANDLE SEND EMAIL TO NEW USER
-        // const props = {
-        //   title: "Twoje konto zostało utworzone.",
-        //   infoBeforeLink:
-        //     "Towje konto jest nieaktywne, kliknij w poniższy link lub skopiuj go i wklej do przeglądarki, aby aktywować konto: ",
-        //   link: `https://www.tslmanagement.pl/#/confirmation`,
-        //   additionalInfo: "",
-        //   subject: "Potwierdzenie założenia konta",
-        //   mailTo: `${login}`,
-        // };
-        // mailer.mailSend(props);
+        //HANDLE SEND EMAIL TO NEW USER
 
+        if (language === "PL") {
+          const props = {
+            title: "Twoje konto zostało utworzone.",
+            infoBeforeLink: "",
+            link: "",
+            additionalInfo: "",
+            subject: "Potwierdzenie założenia konta",
+            mailTo: `${login}`,
+          };
+          mailer.mailSend(props);
+        } else {
+          const props = {
+            title: "Ваш обліковий запис створено.",
+            infoBeforeLink: "",
+            link: "",
+            additionalInfo: "",
+            subject: "Підтвердження створення облікового запису",
+            mailTo: `${login}`,
+          };
+          mailer.mailSend(props);
+        }
         //SEND MAIL To ADMIN
-        // const adminData = {
-        //   mailFrom: `${login}`,
-        //   content: "dodał konto",
-        // };
-        // adminMailer.adminInfo(adminData);
+        const adminData = {
+          mailFrom: `${login}`,
+          content: "dodał konto",
+        };
+        adminMailer.adminInfo(adminData);
       }
     });
   } catch (error) {
@@ -64,49 +75,6 @@ exports.addUser = (request, response, next) => {
         language === "PL"
           ? "Przepraszamy błąd po stronie serwera, spróbuj za kilka minut."
           : "На жаль, помилка на стороні сервера, будь ласка, спробуйте за кілька хвилин.",
-    });
-  }
-};
-
-exports.confirmAdd = (request, response) => {
-  try {
-    const userLogin = request.params.userLogin;
-
-    const findUser = Login.find({
-      login: userLogin,
-    });
-    findUser.exec((err, data) => {
-      if (data.length === 0 || data === null) {
-        response.status(404).json({
-          message: "Nie ma takiego adresu email w bazie",
-        });
-        return;
-      }
-      const filter = data[0]._id;
-      const update = { active: true };
-      Login.findByIdAndUpdate(filter, update, { new: true }, (err, data) => {
-        if (err) {
-          response.status(404).json({
-            message: "coś poszło nie tak przy userAddActive",
-          });
-          return;
-        }
-        response.status(202).json({
-          message:
-            "Twoje konto zostało aktywowane, możesz przejść do panelu logowania - dziękujęmy.",
-        });
-        const adminData = {
-          mailFrom: `${userLogin}`,
-          content: "aktywował konto",
-        };
-        adminMailer.adminInfo(adminData);
-      });
-    });
-  } catch (error) {
-    response.status(500).json({
-      error,
-      message:
-        "Oops! Coś poszło nie tak, przy metodzie GET w endpointcie /confirmAdd",
     });
   }
 };
@@ -335,7 +303,7 @@ exports.putUser = (request, response, next) => {
         });
         return;
       }
-      console.log(data);
+
       response.status(202).json({
         data,
       });
@@ -388,21 +356,34 @@ exports.delUser = (request, response, next) => {
 
           response.status(200).end();
 
-          // const props = {
-          //   title: "Właśnie usunołeś swoje konto z serwisu",
-          //   infoBeforeLink: "Dziękujemy że z nami byłeś.",
-          //   link: "",
-          //   additionalInfo:
-          //     "Twoje konto i dane które podałeś zostału usunięte, Twoje komentarze i posty pozostały w serwisie.",
-          //   subject: "Usunięcie konta",
-          //   mailTo: `${data.login}`,
-          // };
-          // mailer.mailSend(props);
-          // const adminData = {
-          //   mailFrom: `${data.login}`,
-          //   content: "usunął konto",
-          // };
-          // adminMailer.adminInfo(adminData);
+          if (language === "PL") {
+            const props = {
+              title: "Właśnie usunołeś swoje konto z serwisu",
+              infoBeforeLink: "Dziękujemy że z nami byłeś.",
+              link: "",
+              additionalInfo:
+                "Twoje konto i dane które podałeś zostały trwale usunięte.",
+              subject: "Usunięcie konta",
+              mailTo: `${data.login}`,
+            };
+            mailer.mailSend(props);
+          } else {
+            const props = {
+              title: "Ви щойно видалили свій обліковий запис із сайту",
+              infoBeforeLink: "Дякуємо, що ви з нами.",
+              link: "",
+              additionalInfo:
+                "Ваш обліковий запис і дані, які ви надали, видалено назавжди.",
+              subject: "Видалення облікового запису",
+              mailTo: `${data.login}`,
+            };
+            mailer.mailSend(props);
+          }
+          const adminData = {
+            mailFrom: `${data.login}`,
+            content: "usunął konto",
+          };
+          adminMailer.adminInfo(adminData);
         });
       }
     });

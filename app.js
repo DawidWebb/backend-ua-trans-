@@ -18,7 +18,7 @@ mongoose.connect(DB, {
   useFindAndModify: false,
 });
 
-// const adminRoutes = require("./routes/admin");
+const adminRoutes = require("./routes/admin");
 // const helpRoutes = require("./routes/help");
 const needTransport = require("./routes/needTransport");
 const haveTransport = require("./routes/haveTransport");
@@ -28,7 +28,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(fileUploader());
 
-// app.use("/admin", adminRoutes);
+app.use("/admin", adminRoutes);
 // app.use("/help", helpRoutes);
 app.use("/need-transport", needTransport);
 app.use("/have-transport", haveTransport);
