@@ -1,5 +1,7 @@
 const { v4: uuid } = require("uuid");
 const Login = require("../models/login");
+const Needs = require("../models/needs");
+const Transport = require("../models/transport");
 const mailer = require("../helpers/sendMail");
 const adminMailer = require("../helpers/adminMail");
 const crypto = require("crypto");
@@ -353,6 +355,32 @@ exports.delUser = (request, response, next) => {
             });
             return;
           }
+          Transport.deleteMany({ userId: userId }, function (err, data) {
+            if (!err) {
+              return;
+            } else {
+              response.status(500).json({
+                err,
+                message:
+                  language === "PL"
+                    ? "Przepraszamy błąd po stronie serwera, spróbuj za kilka minut."
+                    : "На жаль, помилка на стороні сервера, будь ласка, спробуйте за кілька хвилин.",
+              });
+            }
+          });
+          Needs.deleteMany({ userId: userId }, function (err, data) {
+            if (!err) {
+              return;
+            } else {
+              response.status(500).json({
+                err,
+                message:
+                  language === "PL"
+                    ? "Przepraszamy błąd po stronie serwera, spróbuj za kilka minut."
+                    : "На жаль, помилка на стороні сервера, будь ласка, спробуйте за кілька хвилин.",
+              });
+            }
+          });
 
           response.status(200).end();
 
